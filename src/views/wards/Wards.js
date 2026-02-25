@@ -36,6 +36,10 @@ const Wards = () => {
   const [toastVisible, setToastVisible] = useState(false)
   const [errors, setErrors] = useState({})
 
+  const [deleteVisible, setDeleteVisible] = useState(false)
+  const [selectedWard, setSelectedWard] = useState(null)
+  const [toastMessage, setToastMessage] = useState('')
+
   const [formData, setFormData] = useState({
     name: '',
     type: 'General',
@@ -74,6 +78,7 @@ const Wards = () => {
 
       setConfirmVisible(false)
       setVisible(false)
+      setToastMessage('Ward created successfully!')
       setToastVisible(true)
       setFormData({ name: '', type: 'General', floor: '' })
       setErrors({})
@@ -108,6 +113,26 @@ const Wards = () => {
     }
   }
 
+  const handleDeleteClick = (ward) => {
+    setSelectedWard(ward)
+    setDeleteVisible(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedWard) return
+
+    try {
+      await API.delete(`/wards/${selectedWard.ID}`)
+
+      setDeleteVisible(false)
+      setToastMessage('Ward deleted successfully!')
+      setToastVisible(true)
+      fetchWards()
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   return (
     <>
       <CCard>
@@ -129,6 +154,7 @@ const Wards = () => {
                 <CTableHeaderCell>Name</CTableHeaderCell>
                 <CTableHeaderCell>Type</CTableHeaderCell>
                 <CTableHeaderCell>Floor</CTableHeaderCell>
+                <CTableHeaderCell>Actions</CTableHeaderCell>
               </CTableRow>
             </CTableHead>
 
@@ -138,6 +164,16 @@ const Wards = () => {
                   <CTableDataCell>{ward.Name}</CTableDataCell>
                   <CTableDataCell>{ward.Type}</CTableDataCell>
                   <CTableDataCell>{ward.Floor}</CTableDataCell>
+                  <CTableDataCell>
+                    <CButton
+                      color="danger"
+                      size="sm"
+                      className="text-white"
+                      onClick={() => handleDeleteClick(ward)}
+                    >
+                      Delete
+                    </CButton>
+                  </CTableDataCell>
                 </CTableRow>
               ))}
             </CTableBody>
@@ -225,6 +261,27 @@ const Wards = () => {
         </CModalFooter>
       </CModal>        
 
+      <CModal visible={deleteVisible} onClose={() => setDeleteVisible(false)}>
+        <CModalHeader>
+          <CModalTitle>Delete Ward</CModalTitle>
+        </CModalHeader>
+
+        <CModalBody>
+          Are you sure you want to delete ward:
+          <strong> {selectedWard?.Name}</strong> ?
+        </CModalBody>
+
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setDeleteVisible(false)}>
+            Cancel
+          </CButton>
+
+          <CButton color="danger" onClick={handleDeleteConfirm}>
+            Delete
+          </CButton>
+        </CModalFooter>
+      </CModal>        
+
       <CToaster placement="top-end">
         <CToast
           visible={toastVisible}
@@ -235,7 +292,7 @@ const Wards = () => {
           onClose={() => setToastVisible(false)}
         >
           <div className="d-flex">
-            <CToastBody>Ward created successfully!</CToastBody>
+            <CToastBody>{toastMessage}</CToastBody>
             <CToastClose className="me-2 m-auto" white />
           </div>
         </CToast>
