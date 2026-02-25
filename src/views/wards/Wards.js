@@ -46,6 +46,14 @@ const Wards = () => {
     floor: '',
   })
 
+  const [editVisible, setEditVisible] = useState(false)
+  const [editData, setEditData] = useState({
+    id: null,
+    name: '',
+    type: 'General',
+    floor: '',
+  })
+
   useEffect(() => {
     fetchWards()
   }, [])
@@ -59,11 +67,19 @@ const Wards = () => {
     }
   }
 
-  const handleChange = (e) => {
+  const handleChange = (field, value) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [field]: value,
     })
+
+    // Clear field error when user edits
+    if (errors[field]) {
+      setErrors({
+        ...errors,
+        [field]: null,
+      })
+    }
   }
 
   const handleSubmit = async () => {
@@ -133,6 +149,58 @@ const Wards = () => {
     }
   }
 
+  const handleEditClick = (ward) => {
+    setEditData({
+      id: ward.ID,
+      name: ward.Name,
+      type: ward.Type,
+      floor: ward.Floor,
+    })
+    setEditVisible(true)
+  }
+
+  const validateEditForm = () => {
+    let newErrors = {}
+
+    if (!editData.name.trim()) {
+      newErrors.name = 'Ward name is required'
+    }
+
+    if (!editData.floor || parseInt(editData.floor) <= 0) {
+      newErrors.floor = 'Floor must be greater than 0'
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleEditChange = (field, value) => {
+    setEditData({ ...editData, [field]: value })
+
+    if (errors[field]) {
+      setErrors({ ...errors, [field]: null })
+    }
+  }
+
+  const handleEditSubmit = async () => {
+    if (!validateEditForm()) return
+
+    try {
+      await API.put(`/wards/${editData.id}`, {
+        name: editData.name,
+        type: editData.type,
+        floor: parseInt(editData.floor),
+      })
+
+      setEditVisible(false)
+      setToastMessage('Ward updated successfully!')
+      setToastVisible(true)
+      fetchWards()
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   return (
     <>
       <CCard>
@@ -166,6 +234,15 @@ const Wards = () => {
                   <CTableDataCell>{ward.Floor}</CTableDataCell>
                   <CTableDataCell>
                     <CButton
+                      color="info"
+                      size="sm"
+                      className="text-white me-2"
+                      onClick={() => handleEditClick(ward)}
+                    >
+                      Edit
+                    </CButton>
+
+                    <CButton
                       color="danger"
                       size="sm"
                       className="text-white"
@@ -192,9 +269,8 @@ const Wards = () => {
             <div className="mb-3">
               <CFormLabel>Ward Name</CFormLabel>
               <CFormInput
-                name="name"
                 value={formData.name}
-                onChange={handleChange}
+                onChange={(e) => handleChange('name', e.target.value)}
                 invalid={!!errors.name}
               />
               {errors.name && (
@@ -205,9 +281,8 @@ const Wards = () => {
             <div className="mb-3">
               <CFormLabel>Ward Type</CFormLabel>
               <CFormSelect
-                name="type"
                 value={formData.type}
-                onChange={handleChange}
+                onChange={(e) => handleChange('type', e.target.value)}
               >
                 <option value="General">General</option>
                 <option value="ICU">ICU</option>
@@ -218,9 +293,8 @@ const Wards = () => {
               <CFormLabel>Floor</CFormLabel>
               <CFormInput
                 type="number"
-                name="floor"
                 value={formData.floor}
-                onChange={handleChange}
+                onChange={(e) => handleChange('floor', e.target.value)}
                 invalid={!!errors.floor}
               />
               {errors.floor && (
@@ -278,6 +352,73 @@ const Wards = () => {
 
           <CButton color="danger" onClick={handleDeleteConfirm}>
             Delete
+          </CButton>
+        </CModalFooter>
+      </CModal>        
+
+      <CModal visible={editVisible} onClose={() => setEditVisible(false)}>
+        <CModalHeader>
+          <CModalTitle>Edit Ward</CModalTitle>
+        </CModalHeader>
+
+        <CModalBody>
+          <div className="mb-3">
+            <CFormLabel>Ward Name</CFormLabel>
+            <CFormInput
+              value={editData.name}
+              onChange={(e) => 
+                handleEditChange('name', e.target.value)
+              }
+              invalid={!!errors.name}
+            />
+            {errors.name && (
+              <div className="text-danger small">{errors.name}</div>
+            )}
+          </div>
+
+          <div className="mb-3">
+            <CFormLabel>Ward Type</CFormLabel>
+            <CFormSelect
+              value={editData.type}
+              onChange={(e) => 
+                handleEditChange('type', e.target.value)
+              }
+            >
+              <option value="General">General</option>
+              <option value="ICU">ICU</option>
+            </CFormSelect>
+          </div>
+
+          <div className="mb-3">
+            <CFormLabel>Floor</CFormLabel>
+            <CFormInput
+              type="number"
+              value={editData.floor}
+              onChange={(e) => 
+                handleEditChange('floor', e.target.value)
+              }
+              invalid={!!errors.floor}
+            />
+            {errors.floor && (
+              <div className="text-danger small">{errors.floor}</div>
+            )}
+          </div>
+        </CModalBody>
+
+        <CModalFooter>
+          <CButton
+            color="secondary"
+            onClick={() => setEditVisible(false)}
+          >
+            Cancel
+          </CButton>
+
+          <CButton
+            color="success"
+            className="text-white"
+            onClick={handleEditSubmit}
+          >
+            Update
           </CButton>
         </CModalFooter>
       </CModal>        
