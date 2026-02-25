@@ -20,13 +20,21 @@ import {
   CFormInput,
   CFormLabel,
   CSpinner,
-  CFormSelect
+  CFormSelect,
+  CToast,
+  CToastBody,
+  CToastClose,
+  CToaster,
 } from '@coreui/react'
 
 const Wards = () => {
   const [wards, setWards] = useState([])
   const [visible, setVisible] = useState(false)
   const [loading, setLoading] = useState(false)
+
+  const [confirmVisible, setConfirmVisible] = useState(false)
+  const [toastVisible, setToastVisible] = useState(false)
+  const [errors, setErrors] = useState({})
 
   const [formData, setFormData] = useState({
     name: '',
@@ -55,11 +63,6 @@ const Wards = () => {
   }
 
   const handleSubmit = async () => {
-    if (!formData.name || !formData.type || !formData.floor) {
-      alert('Please fill all fields')
-      return
-    }
-
     try {
       setLoading(true)
 
@@ -69,14 +72,39 @@ const Wards = () => {
         floor: parseInt(formData.floor),
       })
 
+      setConfirmVisible(false)
       setVisible(false)
-      setFormData({ name: '', type: '', floor: '' })
+      setToastVisible(true)
+      setFormData({ name: '', type: 'General', floor: '' })
+      setErrors({})
       fetchWards()
     } catch (err) {
       console.error(err)
-      alert('Error creating ward')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const validateForm = () => {
+    let newErrors = {}
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Ward name is required'
+    }
+
+    if (!formData.floor) {
+      newErrors.floor = 'Floor is required'
+    } else if (parseInt(formData.floor) <= 0) {
+      newErrors.floor = 'Floor must be greater than 0'
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleSaveClick = () => {
+    if (validateForm()) {
+      setConfirmVisible(true)
     }
   }
 
@@ -131,7 +159,11 @@ const Wards = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
+                invalid={!!errors.name}
               />
+              {errors.name && (
+                <div className="text-danger small">{errors.name}</div>
+              )}
             </div>
 
             <div className="mb-3">
@@ -153,7 +185,11 @@ const Wards = () => {
                 name="floor"
                 value={formData.floor}
                 onChange={handleChange}
+                invalid={!!errors.floor}
               />
+              {errors.floor && (
+                <div className="text-danger small">{errors.floor}</div>
+              )}
             </div>
           </CForm>
         </CModalBody>
@@ -163,11 +199,47 @@ const Wards = () => {
             Cancel
           </CButton>
 
-          <CButton color="primary" onClick={handleSubmit} disabled={loading}>
-            {loading ? <CSpinner size="sm" /> : 'Save'}
+          <CButton color="primary" onClick={handleSaveClick} disabled={loading}>
+            Save
           </CButton>
         </CModalFooter>
       </CModal>
+
+      <CModal visible={confirmVisible} onClose={() => setConfirmVisible(false)}>
+        <CModalHeader>
+          <CModalTitle>Confirm Action</CModalTitle>
+        </CModalHeader>
+
+        <CModalBody>
+          Are you sure you want to create this ward?
+        </CModalBody>
+
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setConfirmVisible(false)}>
+            Cancel
+          </CButton>
+
+          <CButton color="primary" onClick={handleSubmit} disabled={loading}>
+            {loading ? <CSpinner size="sm" /> : 'Confirm'}
+          </CButton>
+        </CModalFooter>
+      </CModal>        
+
+      <CToaster placement="top-end">
+        <CToast
+          visible={toastVisible}
+          autohide={true}
+          delay={3000}
+          color="success"
+          className="text-white"
+          onClose={() => setToastVisible(false)}
+        >
+          <div className="d-flex">
+            <CToastBody>Ward created successfully!</CToastBody>
+            <CToastClose className="me-2 m-auto" white />
+          </div>
+        </CToast>
+      </CToaster>        
     </>
   )
 }
