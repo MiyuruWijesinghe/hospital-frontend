@@ -1,4 +1,6 @@
 import React from 'react'
+import CIcon from '@coreui/icons-react'
+import { cilArrowTop, cilArrowBottom } from '@coreui/icons'
 import {
   CTable,
   CTableHead,
@@ -9,12 +11,30 @@ import {
   CButton,
 } from '@coreui/react'
 
-const WardTable = ({ wards, onEdit, onDelete }) => {
+const WardTable = ({ wards, onEdit, onDelete, sortOrder, onSortChange, }) => {
   return (
     <CTable bordered hover responsive>
       <CTableHead>
         <CTableRow>
-          <CTableHeaderCell>Name</CTableHeaderCell>
+          <CTableHeaderCell
+            style={{ cursor: 'pointer', position: 'relative' }}
+            onClick={onSortChange}
+            >
+            Name
+            <span
+                style={{
+                    position: 'absolute',
+                    right: '8px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                }}
+            >
+                <CIcon
+                    icon={sortOrder === 'asc' ? cilArrowTop : cilArrowBottom}
+                    size="sm"
+                />
+            </span>
+          </CTableHeaderCell>
           <CTableHeaderCell>Type</CTableHeaderCell>
           <CTableHeaderCell>Floor</CTableHeaderCell>
           <CTableHeaderCell>Actions</CTableHeaderCell>

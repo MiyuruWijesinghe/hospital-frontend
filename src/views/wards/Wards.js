@@ -52,15 +52,23 @@ const Wards = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(5)
 
-  const filteredWards = wards.filter((ward) => {
-  const term = searchTerm.toLowerCase()
+  const [sortOrder, setSortOrder] = useState('asc')
 
-  return (
-    ward.Name?.toLowerCase().includes(term) ||
-    ward.Type?.toLowerCase().includes(term) ||
-    ward.Floor?.toString().includes(term)
-  )
-})
+  const filteredWards = wards.filter((ward) => {
+    const term = searchTerm.toLowerCase()
+
+    return (
+      ward.Name?.toLowerCase().includes(term) ||
+      ward.Type?.toLowerCase().includes(term) ||
+      ward.Floor?.toString().includes(term)
+    )
+  })
+  .sort((a, b) => {
+    if (sortOrder === 'asc') {
+      return a.Name.localeCompare(b.Name)
+    }
+    return b.Name.localeCompare(a.Name)
+  })
 
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
@@ -249,6 +257,10 @@ const Wards = () => {
             wards={currentItems}
             onEdit={handleEditClick}
             onDelete={handleDeleteClick}
+            sortOrder={sortOrder}
+            onSortChange={() =>
+              setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+            }
           />
           <DataPagination
             totalItems={filteredWards.length}
