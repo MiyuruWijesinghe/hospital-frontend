@@ -6,6 +6,7 @@ import WardFormModal from './WardFormModal'
 import WardEditModal from './WardEditModal'
 import WardDeleteModal from './WardDeleteModal'
 import { validateWard } from './wardValidation'
+import DataPagination from '../../components/common/DataPagination'
 
 import {
   CCard,
@@ -16,6 +17,8 @@ import {
   CToastBody,
   CToastClose,
   CToaster,
+  CFormInput,
+  CFormSelect
 } from '@coreui/react'
 
 const Wards = () => {
@@ -44,6 +47,24 @@ const Wards = () => {
 
   const [toastVisible, setToastVisible] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
+
+  const [searchTerm, setSearchTerm] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(5)
+
+  const filteredWards = wards.filter((ward) => {
+  const term = searchTerm.toLowerCase()
+
+  return (
+    ward.Name?.toLowerCase().includes(term) ||
+    ward.Type?.toLowerCase().includes(term) ||
+    ward.Floor?.toString().includes(term)
+  )
+})
+
+  const indexOfLastItem = currentPage * itemsPerPage
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage
+  const currentItems = filteredWards.slice(indexOfFirstItem, indexOfLastItem)
 
   useEffect(() => {
     fetchWards()
@@ -175,21 +196,65 @@ const Wards = () => {
     <>
       <CCard>
         <CCardHeader>
-          Wards
-          <CButton
-            color="primary"
-            className="float-end"
-            onClick={() => setVisible(true)}
-          >
-            Add Ward
-          </CButton>
+          <div className="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+            {/* Title */}
+            <h5 className="mb-0">Wards</h5>
+
+            {/* Right Controls */}
+            <div className="d-flex align-items-center gap-2">
+
+              {/* Search */}
+              <CFormInput
+                placeholder="Search ward..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value)
+                  setCurrentPage(1)
+                }}
+                size="sm"
+                style={{ width: '200px' }}
+              />
+
+              {/* Page Size */}
+              <CFormSelect
+                size="sm"
+                value={itemsPerPage}
+                onChange={(e) => {
+                  setItemsPerPage(parseInt(e.target.value))
+                  setCurrentPage(1)
+                }}
+                style={{ width: '90px' }}
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+              </CFormSelect>
+
+              {/* Add Button */}
+              <CButton
+                color="primary"
+                size="sm"
+                onClick={() => setVisible(true)}
+              >
+                Add Ward
+              </CButton>
+
+            </div>
+          </div>
         </CCardHeader>
 
         <CCardBody>
           <WardTable
-            wards={wards}
+            wards={currentItems}
             onEdit={handleEditClick}
             onDelete={handleDeleteClick}
+          />
+          <DataPagination
+            totalItems={filteredWards.length}
+            currentPage={currentPage}
+            itemsPerPage={itemsPerPage}
+            onPageChange={(page) => setCurrentPage(page)}
           />
         </CCardBody>
       </CCard>
