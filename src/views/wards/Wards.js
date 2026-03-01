@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import API from '../../services/api'
 
 import WardTable from './WardTable'
@@ -54,25 +54,30 @@ const Wards = () => {
 
   const [sortOrder, setSortOrder] = useState('asc')
 
-  const filteredWards = wards.filter((ward) => {
-    const term = searchTerm.toLowerCase()
+  const filteredWards = useMemo(() => {
+    return wards
+      .filter((ward) => {
+        const term = searchTerm.toLowerCase()
 
-    return (
-      ward.Name?.toLowerCase().includes(term) ||
-      ward.Type?.toLowerCase().includes(term) ||
-      ward.Floor?.toString().includes(term)
-    )
-  })
-  .sort((a, b) => {
-    if (sortOrder === 'asc') {
-      return a.Name.localeCompare(b.Name)
-    }
-    return b.Name.localeCompare(a.Name)
-  })
+        return (
+          ward.Name?.toLowerCase().includes(term) ||
+          ward.Type?.toLowerCase().includes(term) ||
+          ward.Floor?.toString().includes(term)
+        )
+      })
+      .sort((a, b) => {
+        if (sortOrder === 'asc') {
+          return a.Name.localeCompare(b.Name)
+        }
+        return b.Name.localeCompare(a.Name)
+      })
+  }, [wards, searchTerm, sortOrder])
 
-  const indexOfLastItem = currentPage * itemsPerPage
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentItems = filteredWards.slice(indexOfFirstItem, indexOfLastItem)
+  const currentItems = useMemo(() => {
+    const indexOfLastItem = currentPage * itemsPerPage
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage
+    return filteredWards.slice(indexOfFirstItem, indexOfLastItem)
+  }, [filteredWards, currentPage, itemsPerPage])
 
   useEffect(() => {
     fetchWards()
