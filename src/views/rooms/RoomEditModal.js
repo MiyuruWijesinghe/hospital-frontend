@@ -63,7 +63,6 @@ const RoomEditModal = ({
             onChange={(e) => onChange('roomType', e.target.value)}
             invalid={!!errors.roomType}
           >
-            <option value="">Select Type</option>
             <option value="PRIVATE">PRIVATE</option>
             <option value="SHARED">SHARED</option>
           </CFormSelect>
