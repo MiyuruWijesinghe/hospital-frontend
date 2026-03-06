@@ -23,6 +23,11 @@ const AdmissionDetailsModal = ({
 
   const isActive = admission.Status === "ACTIVE"
 
+  const formatDate = (date) => {
+    if (!date) return "—"
+    return new Date(date).toLocaleString()
+  }
+
   return (
     <CModal visible={visible} onClose={onClose}>
 
@@ -78,6 +83,20 @@ const AdmissionDetailsModal = ({
             value={admission.Status}
             disabled
           />
+        </div>
+
+        <div className="mb-3">
+          <CFormLabel>Admitted At</CFormLabel>
+          <CFormInput 
+            value={formatDate(admission.AdmittedAt)} 
+            disabled />
+        </div>
+
+        <div className="mb-3">
+          <CFormLabel>Discharged At</CFormLabel>
+          <CFormInput 
+            value={formatDate(admission.DischargedAt)} 
+            disabled />
         </div>
       </CModalBody>
 

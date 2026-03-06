@@ -1,64 +1,72 @@
 import React, { useEffect, useState } from 'react'
-import {
-  CCard,
-  CCardBody,
-  CCardTitle,
-  CRow,
-  CCol,
-} from '@coreui/react'
 import API from '../../services/api'
 
+import DashboardCards from './DashboardCards'
+import BedOccupancyMap from '../beds/BedOccupancyMap'
+import RecentAdmissions from './RecentAdmissions'
+
+import {
+  CCard,
+  CCardHeader,
+  CCardBody
+} from '@coreui/react'
+
+
 const Dashboard = () => {
-  const [data, setData] = useState(null)
+
+  const [stats, setStats] = useState({})
+  const [rooms, setRooms] = useState([])
+  const [recentAdmissions, setRecentAdmissions] = useState([])
 
   useEffect(() => {
-    API.get('/dashboard')
-      .then((res) => setData(res.data))
-      .catch((err) => console.error(err))
+    fetchStats()
+    fetchRooms()
+    fetchRecentAdmissions()
   }, [])
 
-  if (!data) return <p>Loading dashboard...</p>
+  const fetchStats = async () => {
+    const res = await API.get("/dashboard")
+    setStats(res.data.hospitalSummary)
+  }
 
-  const summary = data.hospitalSummary
+  const fetchRooms = async () => {
+    const res = await API.get("/rooms")
+    setRooms(res.data)
+  }
+
+  const fetchRecentAdmissions = async () => {
+    const res = await API.get("/admissions")
+    setRecentAdmissions(res.data.slice(0,5))
+  }
+
+  if (!stats) return <p>Loading dashboard...</p>
 
   return (
-    <CRow>
-      <CCol sm={3}>
-        <CCard>
-          <CCardBody>
-            <CCardTitle>Total Beds</CCardTitle>
-            <h3>{summary.TotalBeds}</h3>
-          </CCardBody>
-        </CCard>
-      </CCol>
+    <>
+      <DashboardCards stats={stats} />
+      
+      <CCard className="mt-3">
+        <CCardHeader>
+          Bed Occupancy Map
+        </CCardHeader>
 
-      <CCol sm={3}>
-        <CCard color="success" textColor="white">
-          <CCardBody>
-            <CCardTitle>Available</CCardTitle>
-            <h3>{summary.Available}</h3>
-          </CCardBody>
-        </CCard>
-      </CCol>
+        <CCardBody>
+          <BedOccupancyMap rooms={rooms} />
+        </CCardBody>
+      </CCard>
 
-      <CCol sm={3}>
-        <CCard color="danger" textColor="white">
-          <CCardBody>
-            <CCardTitle>Occupied</CCardTitle>
-            <h3>{summary.Occupied}</h3>
-          </CCardBody>
-        </CCard>
-      </CCol>
+      <CCard className="mt-3">
 
-      <CCol sm={3}>
-        <CCard color="warning">
-          <CCardBody>
-            <CCardTitle>Cleaning</CCardTitle>
-            <h3>{summary.Cleaning}</h3>
-          </CCardBody>
-        </CCard>
-      </CCol>
-    </CRow>
+        <CCardHeader>
+          Recent Admissions
+        </CCardHeader>
+
+        <CCardBody>
+          <RecentAdmissions admissions={recentAdmissions} />
+        </CCardBody>
+
+      </CCard>
+    </>
   )
 }
 
