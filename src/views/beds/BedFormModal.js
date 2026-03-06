@@ -65,7 +65,7 @@ const BedFormModal = ({
           >
             <option value="AVAILABLE">AVAILABLE</option>
             <option value="OCCUPIED">OCCUPIED</option>
-            <option value="MAINTENANCE">MAINTENANCE</option>
+            <option value="CLEANING">CLEANING</option>
           </CFormSelect>
         </div>
       </CModalBody>
