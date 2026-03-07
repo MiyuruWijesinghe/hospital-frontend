@@ -5,11 +5,23 @@ import {
   CModalTitle,
   CModalBody,
   CModalFooter,
-  CFormInput,
-  CFormLabel,
   CButton,
-  CSpinner,
+  CRow,
+  CCol,
+  CBadge,
+  CSpinner
 } from '@coreui/react'
+
+const formatDate = (date) => {
+  if (!date) return "—"
+  return new Date(date).toLocaleString()
+}
+
+const getStatusColor = (status) => {
+  if (status === "ACTIVE") return "success"
+  if (status === "DISCHARGED") return "secondary"
+  return "warning"
+}
 
 const AdmissionDetailsModal = ({
   visible,
@@ -21,15 +33,8 @@ const AdmissionDetailsModal = ({
 
   if (!admission) return null
 
-  const isActive = admission.Status === "ACTIVE"
-
-  const formatDate = (date) => {
-    if (!date) return "—"
-    return new Date(date).toLocaleString()
-  }
-
   return (
-    <CModal visible={visible} onClose={onClose}>
+    <CModal visible={visible} onClose={onClose} size="lg">
 
       <CModalHeader>
         <CModalTitle>Admission Details</CModalTitle>
@@ -37,71 +42,95 @@ const AdmissionDetailsModal = ({
 
       <CModalBody>
 
-        <div className="mb-3">
-          <CFormLabel>Patient</CFormLabel>
-          <CFormInput
-            value={`${admission.Patient?.FirstName} ${admission.Patient?.LastName}`}
-            disabled
-          />
-        </div>
+        {/* Row 1 */}
+        <CRow className="mb-3 align-items-center">
+          <CCol md={3}>
+            <div className="text-medium-emphasis small">Patient</div>
+          </CCol>
 
-        <div className="mb-3">
-          <CFormLabel>Ward</CFormLabel>
-          <CFormInput
-            value={admission.Bed?.Room?.Ward?.Name || ''}
-            disabled
-          />
-        </div>
+          <CCol md={5}>
+            <div>{admission.Patient?.FirstName} {admission.Patient?.LastName}</div>
+          </CCol>
 
-        <div className="mb-3">
-          <CFormLabel>Room</CFormLabel>
-          <CFormInput
-            value={admission.Bed?.Room?.RoomNumber || ''}
-            disabled
-          />
-        </div>
+          <CCol md={2}>
+            <div className="text-medium-emphasis small">Status</div>
+          </CCol>
 
-        <div className="mb-3">
-          <CFormLabel>Bed</CFormLabel>
-          <CFormInput
-            value={admission.Bed?.BedNumber || ''}
-            disabled
-          />
-        </div>
+          <CCol md={2}>
+            <CBadge color={getStatusColor(admission.Status)}>
+              {admission.Status}
+            </CBadge>
+          </CCol>
+        </CRow>
 
-        <div className="mb-3">
-          <CFormLabel>Reason</CFormLabel>
-          <CFormInput
-            value={admission.Reason || ''}
-            disabled
-          />
-        </div>
+        {/* Row 2 */}
+        <CRow className="mb-3">
+          <CCol md={3}>
+            <div className="text-medium-emphasis small">Ward</div>
+          </CCol>
 
-        <div className="mb-3">
-          <CFormLabel>Status</CFormLabel>
-          <CFormInput
-            value={admission.Status}
-            disabled
-          />
-        </div>
+          <CCol md={9}>
+            <div>{admission.Bed?.Room?.Ward?.Name}</div>
+          </CCol>
+        </CRow>
 
-        <div className="mb-3">
-          <CFormLabel>Admitted At</CFormLabel>
-          <CFormInput 
-            value={formatDate(admission.AdmittedAt)} 
-            disabled />
-        </div>
+        {/* Row 3 */}
+        <CRow className="mb-3">
+          <CCol md={3}>
+            <div className="text-medium-emphasis small">Room</div>
+          </CCol>
 
-        <div className="mb-3">
-          <CFormLabel>Discharged At</CFormLabel>
-          <CFormInput 
-            value={formatDate(admission.DischargedAt)} 
-            disabled />
-        </div>
+          <CCol md={9}>
+            <div>{admission.Bed?.Room?.RoomNumber}</div>
+          </CCol>
+        </CRow>
+
+        {/* Row 4 */}
+        <CRow className="mb-3">
+          <CCol md={3}>
+            <div className="text-medium-emphasis small">Bed</div>
+          </CCol>
+
+          <CCol md={9}>
+            <div>{admission.Bed?.BedNumber}</div>
+          </CCol>
+        </CRow>
+
+        {/* Row 5 */}
+        <CRow className="mb-3">
+          <CCol md={3}>
+            <div className="text-medium-emphasis small">Reason</div>
+          </CCol>
+
+          <CCol md={9}>
+            <div>{admission.Reason}</div>
+          </CCol>
+        </CRow>
+
+        {/* Row 6 */}
+        <CRow className="mb-3">
+          <CCol md={3}>
+            <div className="text-medium-emphasis small">Admitted At</div>
+          </CCol>
+
+          <CCol md={9}>
+            <div>{formatDate(admission.AdmittedAt)}</div>
+          </CCol>
+        </CRow>
+
+        {/* Row 7 */}
+        <CRow className="mb-3">
+          <CCol md={3}>
+            <div className="text-medium-emphasis small">Discharged At</div>
+          </CCol>
+
+          <CCol md={9}>
+            <div>{formatDate(admission.DischargedAt)}</div>
+          </CCol>
+        </CRow>
       </CModalBody>
 
       <CModalFooter>
-
         <CButton color="secondary" onClick={onClose}>
           Close
         </CButton>
@@ -109,7 +138,7 @@ const AdmissionDetailsModal = ({
         <CButton
           color="danger"
           className="text-white"
-          disabled={!isActive || loading}
+          disabled={admission.Status !== "ACTIVE" || loading}
           onClick={onDischarge}
         >
           {loading ? <CSpinner size="sm"/> : "Discharge"}
