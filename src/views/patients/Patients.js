@@ -57,6 +57,19 @@ const Patients = () => {
 
   const [sortOrder, setSortOrder] = useState('asc')
 
+  useEffect(() => {
+    fetchPatients()
+  }, [])
+
+  const fetchPatients = async () => {
+    try {
+      const res = await API.get("/patients")
+      setPatients(res.data)  
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   const filteredPatients = useMemo(() => {
     return patients
       .filter((patient) => {
@@ -83,19 +96,6 @@ const Patients = () => {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage
     return filteredPatients.slice(indexOfFirstItem, indexOfLastItem)
   }, [filteredPatients, currentPage, itemsPerPage])
-
-  useEffect(() => {
-    fetchPatients()
-  }, [])
-
-  const fetchPatients = async () => {
-    try {
-      const res = await API.get("/patients")
-      setPatients(res.data)  
-    } catch (err) {
-      console.error(err)
-    }
-  }
 
   // ======================
   // CREATE HANDLERS

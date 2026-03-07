@@ -39,7 +39,7 @@ const AdmitPatientModal = ({
             invalid={!!errors.patientId}
           >
             <option value="">Select Patient</option>
-            {patients.map((p) => (
+            {patients?.map((p) => (
               <option key={p.ID} value={p.ID}>
                 {p.FirstName} {p.LastName}
               </option>
@@ -56,7 +56,7 @@ const AdmitPatientModal = ({
             invalid={!!errors.bedId}
           >
             <option value="">Select Bed</option>
-            {beds.map((b) => (
+            {beds?.map((b) => (
               <option key={b.ID} value={b.ID}>
                 {b.BedNumber}
               </option>

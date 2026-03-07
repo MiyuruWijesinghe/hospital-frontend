@@ -54,6 +54,19 @@ const Wards = () => {
 
   const [sortOrder, setSortOrder] = useState('asc')
 
+  useEffect(() => {
+    fetchWards()
+  }, [])
+
+  const fetchWards = async () => {
+    try {
+      const res = await API.get('/wards')
+      setWards(res.data)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   const filteredWards = useMemo(() => {
     return wards
       .filter((ward) => {
@@ -78,19 +91,6 @@ const Wards = () => {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage
     return filteredWards.slice(indexOfFirstItem, indexOfLastItem)
   }, [filteredWards, currentPage, itemsPerPage])
-
-  useEffect(() => {
-    fetchWards()
-  }, [])
-
-  const fetchWards = async () => {
-    try {
-      const res = await API.get('/wards')
-      setWards(res.data)
-    } catch (err) {
-      console.error(err)
-    }
-  }
 
   // ======================
   // CREATE HANDLERS
