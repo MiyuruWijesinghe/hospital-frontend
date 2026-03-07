@@ -1,33 +1,75 @@
-import React from "react"
-import { CRow, CCol, CCard, CCardBody } from "@coreui/react"
+import React from 'react'
+import { CRow, CCol, CWidgetStatsF } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import {
+  cilHospital,
+  cilDoor,
+  cilBed,
+  cilUser,
+  cilCheckCircle,
+  cilWarning
+} from '@coreui/icons'
 
 const DashboardCards = ({ stats }) => {
 
-  const cards = [
-    { title: "Total Wards", value: stats.TotalWards },
-    { title: "Total Rooms", value: stats.TotalRooms },
-    { title: "Total Beds", value: stats.TotalBeds },
-    { title: "Active Admissions", value: stats.ActiveAdmissions },
-    { title: "Available Beds", value: stats.AvailableBeds },
-    { title: "Occupied Beds", value: stats.OccupiedBeds },
-    { title: "Cleaning Beds", value: stats.CleaningBeds },
+  const widgets = [
+    {
+      title: "Total Wards",
+      value: stats.TotalWards,
+      icon: cilHospital,
+      color: "primary",
+    },
+    {
+      title: "Total Rooms",
+      value: stats.TotalRooms,
+      icon: cilDoor,
+      color: "info",
+    },
+    {
+      title: "Total Beds",
+      value: stats.TotalBeds,
+      icon: cilBed,
+      color: "primary",
+    },
+    {
+      title: "Active Admissions",
+      value: stats.ActiveAdmissions,
+      icon: cilUser,
+      color: "warning",
+    },
+    {
+      title: "Available Beds",
+      value: stats.AvailableBeds,
+      icon: cilCheckCircle,
+      color: "success",
+    },
+    {
+      title: "Occupied Beds",
+      value: stats.OccupiedBeds,
+      icon: cilBed,
+      color: "danger",
+    },
+    {
+      title: "Cleaning Beds",
+      value: stats.CleaningBeds,
+      icon: cilWarning,
+      color: "secondary",
+    }
   ]
 
   return (
     <CRow>
-      {cards.map((card, index) => (
-        <CCol md={3} key={index} className="mb-3">
+      {widgets.map((w, index) => (
 
-          <CCard>
-            <CCardBody>
+        <CCol sm={6} lg={3} key={index} className="mb-3">
 
-              <div className="text-medium-emphasis small">
-                {card.title}
-              </div>
+          <CWidgetStatsF
+            icon={<CIcon icon={w.icon} height={36} />}
+            value={w.value ?? 0}
+            title={w.title}
+            color={w.color}
+          />
 
-              <h4>{card.value}</h4>
-            </CCardBody>
-          </CCard>
         </CCol>
       ))}
     </CRow>

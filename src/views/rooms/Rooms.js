@@ -4,6 +4,7 @@ import RoomTable from './RoomTable'
 import RoomFormModal from './RoomFormModal'
 import RoomEditModal from './RoomEditModal'
 import RoomDeleteModal from './RoomDeleteModal'
+import RoomBedsModal from './RoomBedsModal'
 import { validateRoom } from './roomValidation'
 import DataPagination from '../../components/common/DataPagination'
 
@@ -41,6 +42,7 @@ const Rooms = () => {
     roomType: 'PRIVATE'
   })
 
+  const [bedsVisible, setBedsVisible] = useState(false)
   const [selectedRoom, setSelectedRoom] = useState(null)
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
@@ -216,6 +218,11 @@ const Rooms = () => {
     }
   }
 
+  const handleViewBeds = (room) => {
+    setSelectedRoom(room)
+    setBedsVisible(true)
+  }
+
   return (
     <>
       <CCard>
@@ -276,6 +283,7 @@ const Rooms = () => {
             onSortChange={() =>
               setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
             }
+            onViewBeds={handleViewBeds}
           />
           <DataPagination
             totalItems={filteredRooms.length}
@@ -316,6 +324,13 @@ const Rooms = () => {
         room={selectedRoom}
         onClose={() => setDeleteVisible(false)}
         onConfirm={handleDeleteConfirm}
+      />
+
+      {/* Room Beds Modal */}
+      <RoomBedsModal
+        visible={bedsVisible}
+        onClose={() => setBedsVisible(false)}
+        room={selectedRoom}
       />
 
       {/* Toast */}

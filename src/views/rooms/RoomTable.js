@@ -11,7 +11,7 @@ import {
   CButton,
 } from '@coreui/react'
 
-const RoomTable = ({ rooms, onEdit, onDelete, sortOrder, onSortChange }) => {
+const RoomTable = ({ rooms, onEdit, onDelete, sortOrder, onSortChange, onViewBeds }) => {
   return (
     <CTable bordered hover responsive>
       <CTableHead>
@@ -60,10 +60,18 @@ const RoomTable = ({ rooms, onEdit, onDelete, sortOrder, onSortChange }) => {
               <CButton
                 color="danger"
                 size="sm"
-                className="text-white"
+                className="text-white me-2"
                 onClick={() => onDelete(room)}
               >
                 Delete
+              </CButton>
+              <CButton
+                size="sm"
+                color="success"
+                className="text-white"
+                onClick={() => onViewBeds(room)}
+              >
+                View Beds
               </CButton>
             </CTableDataCell>
           </CTableRow>
