@@ -74,7 +74,7 @@ const Admissions = () => {
 
   const fetchBeds = async () => {
     try {
-      const res = await API.get("/beds")
+      const res = await API.get("/beds/status/AVAILABLE")
       setBeds(res.data)
     } catch (error) {
       console.error(error)  

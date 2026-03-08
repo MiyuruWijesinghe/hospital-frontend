@@ -58,7 +58,7 @@ const AdmitPatientModal = ({
             <option value="">Select Bed</option>
             {beds?.map((b) => (
               <option key={b.ID} value={b.ID}>
-                {b.BedNumber}
+                {b.BedNumber} (Room {b.Room?.RoomNumber}, Ward {b.Room?.Ward?.Name})
               </option>
             ))}
           </CFormSelect>
